@@ -1,7 +1,9 @@
-import { pages, subPackages, tabBar } from '@/pages.json'
+import pagesConfig from '@/pages.json'
 import { isMpWeixin } from './platform'
 
-const getLastPage = () => {
+const { pages, subPackages, tabBar = { list: [] } } = { ...pagesConfig }
+
+export const getLastPage = () => {
   // getCurrentPages() 至少有1个元素，所以不再额外判断
   // const lastPage = getCurrentPages().at(-1)
   // 上面那个在低版本安卓中打包会报错，所以改用下面这个【虽然我加了 src/interceptions/prototype.ts，但依然报错】
@@ -9,8 +11,26 @@ const getLastPage = () => {
   return pages[pages.length - 1]
 }
 
+export const tabBarList = tabBar?.list || []
+
 /** 判断当前页面是否是 tabbar 页  */
 export const getIsTabbar = () => {
+  try {
+    const lastPage = getLastPage()
+    const currPath = lastPage?.route
+
+    return Boolean(tabBar?.list?.some((item) => item.pagePath === currPath))
+  } catch {
+    return false
+  }
+}
+
+/**
+ * 判断指定页面是否是 tabbar 页
+ * @param path 页面路径
+ * @returns true: 是 tabbar 页 false: 不是 tabbar 页
+ */
+export const isTableBar = (path: string) => {
   if (!tabBar) {
     return false
   }
@@ -18,9 +38,11 @@ export const getIsTabbar = () => {
     // 通常有 tabBar 的话，list 不能有空，且至少有2个元素，这里其实不用处理
     return false
   }
-  const lastPage = getLastPage()
-  const currPath = lastPage.route
-  return !!tabBar.list.find((e) => e.pagePath === currPath)
+  // 这里需要处理一下 path，因为 tabBar 中的 pagePath 是不带 /pages 前缀的
+  if (path.startsWith('/')) {
+    path = path.substring(1)
+  }
+  return !!tabBar.list.find((e) => e.pagePath === path)
 }
 
 /**
@@ -79,14 +101,13 @@ export const getUrlObj = (url: string) => {
  */
 export const getAllPages = (key = 'needLogin') => {
   // 这里处理主包
-  const mainPages = [
-    ...pages
-      .filter((page) => !key || page[key])
-      .map((page) => ({
-        ...page,
-        path: `/${page.path}`,
-      })),
-  ]
+  const mainPages = pages
+    .filter((page) => !key || page[key])
+    .map((page) => ({
+      ...page,
+      path: `/${page.path}`,
+    }))
+
   // 这里处理分包
   const subPages: any[] = []
   subPackages.forEach((subPageObj) => {

@@ -11,14 +11,14 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@img/*": ["./src/static/*"]
     },
     "outDir": "dist",
     "lib": ["esnext", "dom"],
     "types": [
       "@dcloudio/types",
       "@uni-helper/uni-types",
-      "@types/wechat-miniprogram",
       "wot-design-uni/global.d.ts",
       "z-paging/types",
       "./src/typings.d.ts"

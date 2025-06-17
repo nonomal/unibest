@@ -6,7 +6,6 @@
   - **pnpm** - `>=7.30`（推荐使用 `8.12+`）
   - **`VSCode`** - 可选 `WebStrom`
   - **`HBuilderX`** - `APP` 的运行和发布还是离不开它
-  - **Vue-Office** - `v2.1.10`
 
 ## 创建项目
 
@@ -15,6 +14,8 @@
 ```bash
 # 如果没有 pnpm，请先安装: npm i -g pnpm
 pnpm create unibest my-project
+# 时不时加一下 @latest 标识，这样可以使用最新版本的 create-unibest (2025-06-04 发布了  v1.18.5)
+pnpm create unibest@latest my-project
 ```
 
 npm 创建如下(不推荐)
@@ -40,14 +41,22 @@ npm create unibest@latest my-project
 
 `create unibest` 支持 `-t` 参数选择模板，目前已有两大类 `8` 个模板
 
-- `普通` 模板( `4个` ）：分别是 `base`、`tabbar`、`i18n`、`demo`、~~`js`~~
+- `普通` 模板( `4个` ）：分别是 `base`、`tabbar`、`spa`、 `i18n`、`demo`。
 - `hbx` 模板(`2个` ）：分别是 `hbx-base`、`hbx-demo`。
 
 不带 `-t` 参数时会默认生成 `base` 模板。
 
 `base` 模板是最基本的模板，更新最及时，推荐使用 `base` 模板创建新项目。其他几个模板也是基于 `base` 模板得到的。 `demo` 模板则作为参考用。
 
-`js` 模板不推荐使用，可以使用 `base` 模板替代，里面已经做了兼容配置，可以直接编写 `js`，原本的 `ts` 文件还能提供部分类型，何乐而不为？
+`base` 模板的改动会自动同步到其他几个分支，通过 `github actions` 实现。
+
+::: details `tabbar 模板` 和 `spa 模板` 的区别
+
+- `tabbar` 模板里面的tabbar 路由是属于 `tabbar` 级别的，需要使用 `switchTabbar` 切换，`tabbar` 页面会有缓存，渲染性能较好。
+- `spa` 模板类似于前端的 `SPA 应用`，`tabbar` 完全是一个组件实现的。页面之间切换是通过前端状态控制，简单灵活，不受 `tabbar` 的配置限制，但性能不如 `tabbar` 模板。
+- 两者各有优点，按需选用。
+
+:::
 
 ```sh
 # VS Code 模板
@@ -55,9 +64,9 @@ pnpm create unibest my-project # 默认用 base 模板
 
 pnpm create unibest my-project -t base # 基础模板
 pnpm create unibest my-project -t tabbar # 自定义 tabbar 模板
+pnpm create unibest my-project -t spa # 单页应用 模板（使用一个组件模拟tabbar）
 pnpm create unibest my-project -t i18n # 多语言模板
 pnpm create unibest my-project -t demo # 所有demo的模板(包括i18n)
-# pnpm create unibest my-project -t js # js 模板
 
 # HBuilderX 模板，方便使用 uniCloud 云开发 (未来可以对接 uni-app x)
 pnpm create unibest my-project -t hbx-base # hbx的base模板

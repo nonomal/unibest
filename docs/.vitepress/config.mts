@@ -1,18 +1,25 @@
 import dayjs from 'dayjs'
 import { defineConfig } from 'vitepress'
+import llmsPlugin from 'vitepress-plugin-llms'
 import packageJson from '../../package.json'
 
 const buildTime = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
+const base = '/unibest/' // default is /
+
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   lang: 'zh-CN',
-  base: '/',
+  base: base,
   title: 'unibest 官方文档',
   description: '最好用的 uniapp 开发模板',
   lastUpdated: true,
   cleanUrls: true,
   head: [
+    ['link', { rel: 'icon', href: `${base}favicon.ico` }],
+    // 增加构建信息
+    ['meta', { name: 'build-time', content: buildTime }],
+    ['meta', { name: 'version', content: packageJson.version }],
     [
       'meta',
       {
@@ -27,7 +34,6 @@ export default defineConfig({
         content: '菲鸽, 菲哥, 鸽鸽, feige996, feige996, 1020103647@qq.com',
       },
     ],
-    ['link', { rel: 'icon', href: '/favicon.ico' }],
     [
       'meta',
       {
@@ -38,6 +44,8 @@ export default defineConfig({
     // 添加 ICP 备案信息
     ['meta', { name: 'icp', content: '粤ICP备2024160998号' }],
     ['link', { rel: 'license', href: 'https://beian.miit.gov.cn/' }],
+    // 百度联盟meta
+    ['meta', { property: 'baidu_union_verify', content: '8ab9e6068e7febf94e684886f81f406f' }],
     // 其他杂七杂八的 meta 标签
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:site', content: 'feige996' }],
@@ -83,9 +91,6 @@ export default defineConfig({
         content: '最好用的 uniapp 开发模板',
       },
     ],
-    // 增加构建信息
-    ['meta', { name: 'build-time', content: buildTime }],
-    ['meta', { name: 'version', content: packageJson.version }],
     // 下面是百度统计代码
     ['script', { async: '', src: 'https://hm.baidu.com/hm.js?081c2ec121383d9e7d5a35c5833ab6ff' }],
     // 下面是不蒜子统计代码
@@ -112,9 +117,19 @@ export default defineConfig({
         link: '/advanced/rewards/rewards',
       },
       {
+        text: '更新日志',
+        link: '/changelog/CHANGELOG',
+      },
+      {
         text: '相关链接',
         link: '/other/links/links',
-        activeMatch: '/other',
+      },
+      {
+        text: 'unibest备用地址',
+        items: [
+          { text: 'unibest.tech(本站)', link: 'https://unibest.tech' },
+          { text: 'github page(备用)', link: 'https://feige996.github.io/unibest/' },
+        ],
       },
     ],
     sidebar: [
@@ -129,6 +144,7 @@ export default defineConfig({
           },
           { text: 'uni 插件', link: '3-plugin' },
           { text: '样式篇', link: '4-style' },
+          // { text: '样式篇2', link: '4-style2' },
           { text: '图标篇', link: '5-icons' },
           { text: 'SVG篇', link: '6-svg' },
           { text: 'UI库选型篇', link: 'ui/ui' },
@@ -137,14 +153,27 @@ export default defineConfig({
           { text: '状态篇', link: '9-state' },
           { text: '多语言篇', link: '10-i18n' },
           { text: '运行发布', link: '11-build' },
-          { text: '环境变量', link: '12-env' },
+          { text: 'App 专题', link: '18-app' },
+          // { text: '环境变量', link: '12-env' },
           { text: 'hbx 模板', link: '13-hbx' },
           { text: '常见问题', link: '14-faq' },
           { text: '常见问题2', link: '15-faq' },
-          { text: '小程序标识', link: '16-terminology' },
+          // { text: '小程序标识', link: '16-terminology' },
           { text: '自动生成代码', link: '17-generate' },
-          { text: '最佳实践', link: '20-best' },
+          // { text: '最佳实践', link: '20-best' },
         ],
+      },
+      {
+        text: '⭐ 优秀案例',
+        link: '/advanced/showcase/showcase',
+      },
+      {
+        text: '更新日志',
+        link: '/changelog/CHANGELOG',
+      },
+      {
+        text: '升级指南',
+        link: '/changelog/upgrade',
       },
       {
         text: '社交',
@@ -162,8 +191,8 @@ export default defineConfig({
           { text: '相关链接', link: 'links/links' },
           { text: '图片占位图', link: 'image/image' },
           { text: 'iconfont详细版', link: 'iconfont/iconfont' },
-          { text: 'Git 提交优化', link: 'czg/czg' },
-          { text: '文件资源展示优化', link: 'files/files' },
+          // { text: 'Git 提交优化', link: 'czg/czg' },
+          // { text: '文件资源展示优化', link: 'files/files' },
           { text: 'unibest博客', link: 'blog' },
         ],
       },
@@ -180,6 +209,16 @@ export default defineConfig({
         },
         link: 'https://gitee.com/feige996/unibest',
         ariaLabel: 'Gitee',
+      },
+      {
+        icon: {
+          svg: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M18.059 5.80628C18.2234 5.71425 18.3973 5.61696 18.585 5.51037C18.6076 5.63327 18.6297 5.74058 18.6497 5.83784C18.685 6.00943 18.714 6.15059 18.728 6.29005C18.8392 7.50125 19.448 8.39222 20.3108 8.59286C21.5726 8.88583 22.7623 8.40159 23.4033 7.33318C24.1733 6.05123 23.839 4.4812 22.5279 3.53618C18.8826 0.907049 14.8777 0.18191 10.5636 1.44819C1.2616 4.1927 -1.92121 15.6199 4.68062 22.6274C7.50507 25.6249 11.0914 26.9182 15.1624 26.8204C20.3774 26.6979 24.1333 24.099 26.5309 19.5947C28.2308 16.3988 26.3829 12.9055 22.8439 12.1795C20.8227 11.7726 18.7559 11.6405 16.6993 11.7869C16.0151 11.8526 15.3509 12.0547 14.7459 12.3811C14.0691 12.7324 13.8734 13.4614 13.9493 14.1838C14.02 14.8421 14.5247 15.2369 15.1258 15.3362C16.3361 15.5256 17.5609 15.6357 18.7833 15.7361C19.1371 15.7659 19.4942 15.7694 19.8507 15.773C20.3623 15.7781 20.873 15.7832 21.3718 15.8657C22.7949 16.1009 23.2836 17.2557 22.5517 18.4911C22.3724 18.7882 22.1633 19.0662 21.9277 19.3209C20.9703 20.3738 19.7183 21.1144 18.3344 21.4465C15.8084 22.0649 13.2798 22.0996 10.7655 21.3054C7.90238 20.4021 6.19549 18.2991 6.13552 15.4682C6.1131 13.7223 6.55634 12.002 7.41963 10.4843C7.80967 9.77686 8.02376 9.04827 7.96359 8.24664C7.93826 7.90488 7.92423 7.56273 7.90915 7.19506C7.90113 6.99938 7.89281 6.79647 7.88233 6.58254C8.17231 6.6434 8.45871 6.72023 8.74022 6.81271C9.83531 7.25229 10.9132 7.45284 12.0986 7.13019C12.7728 6.96895 13.4697 6.92433 14.159 6.99829C15.269 7.08878 16.3785 6.81759 17.3215 6.22521C17.5569 6.08724 17.7963 5.9533 18.059 5.80628Z" fill="#99989E"/>
+</svg>
+`,
+        },
+        link: 'https://gitcode.com/feige996/unibest',
+        ariaLabel: 'GitCode',
       },
       // #1f80ff 是掘金的 logo 的颜色
       {
@@ -224,5 +263,9 @@ export default defineConfig({
         },
       },
     },
+  },
+  vite: {
+    // 其他配置...
+    plugins: [llmsPlugin() as any],
   },
 })

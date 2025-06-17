@@ -11,15 +11,22 @@ import UniLayouts from '@uni-helper/vite-plugin-uni-layouts'
 import UniPlatform from '@uni-helper/vite-plugin-uni-platform'
 // @see https://github.com/uni-helper/vite-plugin-uni-manifest
 import UniManifest from '@uni-helper/vite-plugin-uni-manifest'
-// @see https://unocss.dev/
+/**
+ * 分包优化、模块异步跨包调用、组件异步跨包引用
+ * @see https://github.com/uni-ku/bundle-optimizer
+ */
+import Optimization from '@uni-ku/bundle-optimizer'
 import { visualizer } from 'rollup-plugin-visualizer'
-import UnoCSS from 'unocss/vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import ViteRestart from 'vite-plugin-restart'
 import { copyNativeRes } from './vite-plugins/copyNativeRes'
+import updatePackageJson from './vite-plugins/updatePackageJson'
+import Components from '@uni-helper/vite-plugin-uni-components'
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command, mode }) => {
+export default async ({ command, mode }) => {
+  // @see https://unocss.dev/
+  const UnoCSS = (await import('unocss/vite')).default
   // console.log(mode === process.env.NODE_ENV) // true
 
   // mode: 区分生产环境还是开发环境
@@ -62,7 +69,6 @@ export default defineConfig(({ command, mode }) => {
       UniPlatform(),
       UniManifest(),
       // UniXXX 需要在 Uni 之前引入
-      Uni(),
       {
         // 临时解决 dcloudio 官方的 @dcloudio/uni-mp-compiler 出现的编译 BUG
         // 参考 github issue: https://github.com/dcloudio/uni-app/issues/4952
@@ -80,8 +86,19 @@ export default defineConfig(({ command, mode }) => {
         imports: ['vue', 'uni-app'],
         dts: 'src/types/auto-import.d.ts',
         dirs: ['src/hooks'], // 自动导入 hooks
-        eslintrc: { enabled: true },
         vueTemplate: true, // default false
+      }),
+      // Optimization 插件需要 page.json 文件，故应在 UniPages 插件之后执行
+      Optimization({
+        enable: {
+          optimization: true,
+          'async-import': true,
+          'async-component': true,
+        },
+        dts: {
+          base: 'src/types',
+        },
+        logger: false,
       }),
 
       ViteRestart({
@@ -105,7 +122,15 @@ export default defineConfig(({ command, mode }) => {
           brotliSize: true,
         }),
       // 只有在 app 平台时才启用 copyNativeRes 插件
-      UNI_PLATFORM === 'app' && copyNativeRes(),
+      // UNI_PLATFORM === 'app' && copyNativeRes(),
+      Components({
+        extensions: ['vue'],
+        deep: true, // 是否递归扫描子目录，
+        directoryAsNamespace: false, // 是否把目录名作为命名空间前缀，true 时组件名为 目录名+组件名，
+        dts: 'src/types/components.d.ts', // 自动生成的组件类型声明文件路径（用于 TypeScript 支持）
+      }),
+      Uni(),
+      updatePackageJson(),
     ],
     define: {
       __UNI_PLATFORM__: JSON.stringify(UNI_PLATFORM),
@@ -144,8 +169,9 @@ export default defineConfig(({ command, mode }) => {
         : undefined,
     },
     build: {
+      sourcemap: false,
       // 方便非h5端调试
-      sourcemap: VITE_SHOW_SOURCEMAP === 'true', // 默认是false
+      // sourcemap: VITE_SHOW_SOURCEMAP === 'true', // 默认是false
       target: 'es6',
       // 开发环境不用压缩
       minify: mode === 'development' ? false : 'terser',
@@ -157,4 +183,4 @@ export default defineConfig(({ command, mode }) => {
       },
     },
   }
-})
+}
